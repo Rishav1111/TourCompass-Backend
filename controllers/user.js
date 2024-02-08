@@ -2,36 +2,7 @@ const Guide = require("../models/guide.model");
 const Traveller = require("../models/traveler.model");
 const jwt = require("jsonwebtoken");
 const jwtSecret = "access";
-const multer = require("multer");
-const path = require("path");
 const bcrypt = require("bcryptjs");
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    // Specify the destination directory for storing uploaded files
-    cb(null, "uploads/");
-  },
-  filename: function (req, file, cb) {
-    // Generate a unique file name for the uploaded file
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
-});
-
-// Multer file filter configuration
-const fileFilter = (req, file, cb) => {
-  // Check if the uploaded file is an image
-  if (file.mimetype.startsWith("image/")) {
-    cb(null, true); // Accept the file
-  } else {
-    cb(new Error("Only image files are allowed."), false); // Reject the file
-  }
-};
-
-// Multer upload configuration
-const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
-});
 
 const createTraveller = async (req, res) => {
   try {
@@ -72,7 +43,7 @@ const createTraveller = async (req, res) => {
       phoneNumber,
       userType,
       password: hashedPassword,
-      confirmPassword: hashedPassword, // Added confirmPassword field
+      confirmPassword: hashedPassword,
     });
 
     const savedUser = await newUser.save();
@@ -130,9 +101,6 @@ const createGuide = async (req, res) => {
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Check if req.files is defined and contains licensePhoto and guidePhot
-
     // Create a new guide object
     const newGuide = new Guide({
       firstname,
@@ -140,7 +108,7 @@ const createGuide = async (req, res) => {
       email,
       phoneNumber,
       password: hashedPassword,
-      confirmPassword: hashedPassword, // Added confirmPassword field
+      confirmPassword: hashedPassword,
       licenseNumber,
       expertPlace,
       guidePrice,
