@@ -27,10 +27,6 @@ const travelerSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  confirmPassword: {
-    type: String,
-    required: true,
-  },
 });
 
 module.exports = mongoose.model("Traveler", travelerSchema);

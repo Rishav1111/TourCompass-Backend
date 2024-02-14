@@ -22,7 +22,14 @@ const createTraveller = async (req, res) => {
         .status(400)
         .json({ msg: "An account with this email already exists." });
     }
-    if (!email || !password || !confirmPassword) {
+    if (
+      !email ||
+      !password ||
+      !firstname ||
+      !lastname ||
+      !phoneNumber ||
+      !confirmPassword
+    ) {
       return res.status(400).json({ msg: "Not all fields have been entered." });
     }
     if (password.length < 8) {
@@ -30,10 +37,10 @@ const createTraveller = async (req, res) => {
         .status(400)
         .json({ msg: "The password needs to be at least 8 characters long." });
     }
+
     if (password !== confirmPassword) {
       return res.status(400).json({ msg: "Passwords do not match." });
     }
-
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new Traveller({
@@ -43,7 +50,6 @@ const createTraveller = async (req, res) => {
       phoneNumber,
       userType,
       password: hashedPassword,
-      confirmPassword: hashedPassword,
     });
 
     const savedUser = await newUser.save();
@@ -76,7 +82,20 @@ const createGuide = async (req, res) => {
 
     const userType = "guide";
 
-    if (!email || !password || !confirmPassword) {
+    if (
+      !email ||
+      !password ||
+      !firstname ||
+      !lastname ||
+      !phoneNumber ||
+      !confirmPassword ||
+      !licenseNumber ||
+      !expertPlace ||
+      !guidePrice ||
+      !bio ||
+      !licensePhoto ||
+      !guidePhoto
+    ) {
       return res.status(400).json({ msg: "Not all fields have been entered." });
     }
 
@@ -99,16 +118,13 @@ const createGuide = async (req, res) => {
         .json({ msg: "An account with this email already exists." });
     }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-    // Create a new guide object
     const newGuide = new Guide({
       firstname,
       lastname,
       email,
       phoneNumber,
       password: hashedPassword,
-      confirmPassword: hashedPassword,
       licenseNumber,
       expertPlace,
       guidePrice,
@@ -169,19 +185,125 @@ const login = async (req, res) => {
         userType: userType,
       },
     });
-    console.log(user);
+    console.log(user.email, "logged in successfully");
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-const deleteUser = async (req, res) => {
+const updateTraveller = async (req, res) => {
   try {
-    const deletedUser = await User.findByIdAndDelete(req.user);
-    res.json(deletedUser);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const { id } = req.params;
+    const { firstname, lastname, email, phoneNumber, password } = req.body;
+
+    const updatedUser = await Traveller.findByIdAndUpdate(
+      id,
+      { firstname, lastname, email, phoneNumber, password },
+      {
+        new: true,
+      }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "Traveller not found." });
+    }
+
+    res
+      .status(200)
+      .json({ updatedUser, msg: "Traveller updated successfully." });
+  } catch (error) {
+    console.error("Error updating traveller:", error);
+    res.status(500).json({ error: error.message });
   }
 };
 
-module.exports = { createGuide, createTraveller, login, deleteUser };
+const updateGuide = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      firstname,
+      lastname,
+      email,
+      phoneNumber,
+      password,
+      licenseNumber,
+      expertPlace,
+      guidePrice,
+      bio,
+      licensePhoto,
+      guidePhoto,
+    } = req.body;
+
+    const updatedUser = await Guide.findByIdAndUpdate(
+      id,
+      {
+        firstname,
+        lastname,
+        email,
+        phoneNumber,
+        password,
+        licenseNumber,
+        expertPlace,
+        guidePrice,
+        bio,
+        licensePhoto,
+        guidePhoto,
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "Guide not found." });
+    }
+
+    res.status(200).json({ updatedUser, msg: "Guide updated successfully." });
+  } catch (error) {
+    console.error("Error updating guide:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const deleteTraveler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const existingTraveler = await Traveller.findById(id);
+    if (!existingTraveler) {
+      return res.status(404).json({ msg: "Traveler not found." });
+    }
+
+    await Traveller.findByIdAndDelete(id);
+
+    res.status(200).json({ msg: "Traveller deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting traveller:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+const deleteGuide = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const existingGuide = await Guide.findById(id);
+    if (!existingGuide) {
+      return res.status(404).json({ msg: "Guide not found." });
+    }
+
+    await Guide.findByIdAndDelete(id);
+
+    res.status(200).json({ msg: "Guide deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting Guide:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  createGuide,
+  createTraveller,
+  login,
+  updateTraveller,
+  updateGuide,
+  deleteTraveler,
+  deleteGuide,
+};
