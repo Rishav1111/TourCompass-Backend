@@ -27,6 +27,8 @@ const travelerSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  resetPin: String,
+  resetPinExpiration: Date,
 });
 
 module.exports = mongoose.model("Traveler", travelerSchema);

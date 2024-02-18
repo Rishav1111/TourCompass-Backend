@@ -196,9 +196,11 @@ const updateTraveller = async (req, res) => {
     const { id } = req.params;
     const { firstname, lastname, email, phoneNumber, password } = req.body;
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const updatedUser = await Traveller.findByIdAndUpdate(
       id,
-      { firstname, lastname, email, phoneNumber, password },
+      { firstname, lastname, email, phoneNumber, password: hashedPassword },
       {
         new: true,
       }
@@ -234,6 +236,8 @@ const updateGuide = async (req, res) => {
       guidePhoto,
     } = req.body;
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const updatedUser = await Guide.findByIdAndUpdate(
       id,
       {
@@ -241,7 +245,7 @@ const updateGuide = async (req, res) => {
         lastname,
         email,
         phoneNumber,
-        password,
+        password: hashedPassword,
         licenseNumber,
         expertPlace,
         guidePrice,

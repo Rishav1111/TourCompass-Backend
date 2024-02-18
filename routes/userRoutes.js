@@ -1,5 +1,5 @@
 const express = require("express");
-const router = express.Router();
+const userRouter = express.Router();
 const {
   createGuide,
   createTraveller,
@@ -11,12 +11,12 @@ const {
 } = require("../controllers/user");
 
 // Routes
-router.post("/signupGuide", createGuide);
-router.post("/signupTraveller", createTraveller);
-router.post("/login", login);
-router.put("/updateGuide/:id", updateGuide);
-router.put("/updateTraveller/:id", updateTraveller);
-router.delete("/deleteTraveller/:id", deleteTraveler);
-router.delete("/deleteGuide/:id", deleteGuide);
+userRouter.post("/signupGuide", createGuide);
+userRouter.post("/signupTraveller", createTraveller);
+userRouter.post("/login", login);
+userRouter.put("/updateGuide/:id", updateGuide);
+userRouter.put("/updateTraveller/:id", updateTraveller);
+userRouter.delete("/deleteTraveller/:id", deleteTraveler);
+userRouter.delete("/deleteGuide/:id", deleteGuide);
 
-module.exports = router;
+module.exports = userRouter;

@@ -1,11 +1,11 @@
 const express = require("express");
-const router = require("./routes/userRoutes");
+const route = require("./routes/index.routes");
 const connectDatabase = require("./Utils/connection"); // Import the connectDatabase function
 const app = express();
 
 app.use(express.json());
 
-app.use("/api", router);
+app.use("/api", route);
 const PORT = process.env.PORT || 5000;
 
 async function start() {
