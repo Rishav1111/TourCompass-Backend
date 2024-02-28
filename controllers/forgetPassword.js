@@ -25,9 +25,10 @@ const FORGETPASSWORD = async (req, res) => {
 
     const pin = generatePin();
     console.log(pin);
-    const expirationTime = new Date().getTime() + 300000;
 
-    const updateUser = await Traveller.findOneAndUpdate(
+    const expirationTime = new Date().getTime() + 30000;
+
+    const updateUser = await (traveller ? Traveller : Guide).findOneAndUpdate(
       { email },
       {
         $set: {
@@ -45,12 +46,12 @@ const FORGETPASSWORD = async (req, res) => {
         <div style="display: inline-block; background-color: #4caf50; color: #fff; padding: 10px 20px; border-radius: 5px; margin-bottom: 20px;">
             <h3 style="margin: 0; font-size: 24px; font-weight: bold;">${pin}</h3>
         </div>
-        <p style="color: #333;">If you did not request a password reset, please ignore this email.</p>
+        <p style="color: #333;">This OTP code will expire after 60 seconds.</p>
         <p style="color: #333;">Thank you!</p>
     </div>`;
 
     // Send the email
-    await sentEmail(email, boilerPlate, "Forget Password");
+    await sentEmail(email, boilerPlate, "OTP for password reset");
 
     res.status(200).json({
       msg: "Password reset email pin has been sent. Please check your email!!",
@@ -63,20 +64,27 @@ const FORGETPASSWORD = async (req, res) => {
 
 const verifyPin = async (req, res) => {
   const { pin, email } = req.body;
-  const user = await Traveller.findOne({ email, resetPin: pin.toString() });
+  const user =
+    (await await Traveller.findOne({ email, resetPin: pin.toString() })) ||
+    (await Guide.findOne({ email, resetPin: pin.toString() }));
+
   if (!user) {
     return res.status(400).json({ msg: "Invalid Pin or Email" });
   }
+
   const now = new Date().getTime();
   if (user.resetPinExpiration < now) {
     return res.status(400).json({ msg: "Pin expired" });
   }
-  const payload = { role: "user", id: user._id };
+
+  const payload = {
+    role: user instanceof Traveller ? "traveller" : "guide",
+    id: user._id,
+  };
 
   const token = jwt.sign(payload, jwtSecret, { expiresIn: "1hr" });
   res.status(200).json({
     msg: "Pin verified",
-
     token,
   });
 };
@@ -84,14 +92,19 @@ const verifyPin = async (req, res) => {
 // Reset User's Password using PIN
 const resetPassword = async (req, res) => {
   const { email, newpassword } = req.body;
-  const user = await Traveller.findOne({
-    email,
-  });
+  const user =
+    (await await Traveller.findOne({ email })) ||
+    (await Guide.findOne({ email }));
+
   if (!user) {
     return res.status(400).json({ msg: "User not found" });
   }
+
   const hashedPassword = await bcrypt.hash(newpassword, 10);
-  const updatedUser = await Traveller.findOneAndUpdate(
+  const updatedUser = await (user instanceof Traveller
+    ? Traveller
+    : Guide
+  ).findOneAndUpdate(
     { email },
     { $set: { password: hashedPassword } },
     { new: true, runValidators: true }

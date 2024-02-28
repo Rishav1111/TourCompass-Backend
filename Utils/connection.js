@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
+const URI =
+  "mongodb+srv://rishav:poldfwlhgJoa3MOc@cluster0.l9sop0d.mongodb.net/TourCompass";
 
-const connectDatabase = async (URI) => {
+connectDatabase = async () => {
   try {
     await mongoose.connect(URI, {
       useNewUrlParser: true,
@@ -11,10 +13,5 @@ const connectDatabase = async (URI) => {
     console.error("Failed to connect to the database:", error);
   }
 };
-
-const mongoURI =
-  "mongodb+srv://rishav:poldfwlhgJoa3MOc@cluster0.l9sop0d.mongodb.net/TourCompass";
-
-connectDatabase(mongoURI);
 
 module.exports = connectDatabase;
