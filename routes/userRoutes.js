@@ -13,19 +13,23 @@ const {
   updateGuide,
   getTraveller,
   getGuide,
+  changePassword,
   deleteTraveller,
   deleteGuide,
 } = require("../controllers/profile");
+const authUser = require("../middleware/auth");
+
 // Routes
 userRouter.post("/signupGuide", createGuide);
 userRouter.post("/signupTraveller", createTraveller);
 userRouter.post("/login", login);
-userRouter.put("/updateGuide/:id", updateGuide);
-userRouter.put("/updateTraveller/:id", updateTraveller);
-userRouter.get("/getTraveller/:id", getTraveller);
-userRouter.get("/getGuide/:id", getGuide);
-userRouter.delete("/deleteTraveller/:id", deleteTraveller);
-userRouter.delete("/deleteGuide/:id", deleteGuide);
+userRouter.put("/updateGuide/:id", authUser, updateGuide);
+userRouter.put("/updateTraveller/:id", authUser, updateTraveller);
+userRouter.get("/getTraveller/:id", authUser, getTraveller);
+userRouter.get("/getGuide/:id", authUser, getGuide);
+userRouter.put("/changePassword/:id", authUser, changePassword);
+userRouter.delete("/deleteTraveller/:id", authUser, deleteTraveller);
+userRouter.delete("/deleteGuide/:id", authUser, deleteGuide);
 userRouter.post("/travellerverifyPin", travellerverifyPin);
 userRouter.post("/guideverifyPin", guideverifyPin);
 
