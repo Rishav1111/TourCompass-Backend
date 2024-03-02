@@ -78,6 +78,14 @@ const updateGuide = async (req, res) => {
   }
 };
 
+const getAllTraveller = async (req, res) => {
+  try {
+    const users = await Traveller.find({});
+    res.status(200).json(users);
+  } catch (error) {
+    console.log("Error getting travellers", error);
+  }
+};
 const getTraveller = async (req, res) => {
   try {
     const { id } = req.params;
@@ -224,6 +232,7 @@ const deleteGuide = async (req, res) => {
 module.exports = {
   updateTraveller,
   updateGuide,
+  getAllTraveller,
   getTraveller,
   getGuide,
   changePassword,
