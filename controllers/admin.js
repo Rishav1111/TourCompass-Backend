@@ -55,7 +55,7 @@ const login = async (req, res) => {
   const token = jwt.sign(tokenData, jwtSecret, {
     expiresIn: "1h",
   });
-  res.status(201).json({
+  res.status(200).json({
     message: "Logged In Successfully!",
     token,
   });

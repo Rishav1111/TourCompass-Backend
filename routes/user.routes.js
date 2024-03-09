@@ -12,6 +12,7 @@ const {
   updateTraveller,
   updateGuide,
   getAllTraveller,
+  getAllGuide,
   getTraveller,
   getGuide,
   changePassword,
@@ -30,11 +31,17 @@ userRouter.post("/signupTraveller", createTraveller);
 userRouter.post("/login", login);
 
 //Routes for update  profile information of both travellers and guides
-userRouter.put("/updateGuide/:id", authUser, updateGuide);
-userRouter.put("/updateTraveller/:id", authUser, updateTraveller);
+userRouter.put("/updateGuide/:id", tokenExtractor, authUser, updateGuide);
+userRouter.put(
+  "/updateTraveller/:id",
+  tokenExtractor,
+  authUser,
+  updateTraveller
+);
 
 //Routes for getting the profile information of both travellers and guides
 userRouter.get("/getAllTraveller", tokenExtractor, adminScope, getAllTraveller);
+userRouter.get("/getAllGuide", tokenExtractor, authUser, getAllGuide);
 userRouter.get("/getTraveller/:id", tokenExtractor, authUser, getTraveller);
 userRouter.get("/getGuide/:id", tokenExtractor, authUser, getGuide);
 

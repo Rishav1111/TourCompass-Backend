@@ -1,6 +1,6 @@
 const express = require("express");
 const route = require("./routes/index.routes");
-const connectDatabase = require("./Utils/connection"); // Import the connectDatabase function
+const connectDatabase = require("./Utils/connection");
 const app = express();
 
 app.use(express.json());
