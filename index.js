@@ -1,8 +1,10 @@
 const express = require("express");
 const route = require("./routes/index.routes");
+const cors = require("cors");
 const connectDatabase = require("./Utils/connection");
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 app.use("/api", route);

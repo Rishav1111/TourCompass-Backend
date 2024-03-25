@@ -1,4 +1,5 @@
 const axios = require("axios");
+
 const autocomplete = async (req, res) => {
   const { input, radius } = req.query;
 
@@ -17,7 +18,9 @@ const autocomplete = async (req, res) => {
 
   try {
     const response = await axios.request(options);
-    res.json(response.data);
+    const predictions = response.data.predictions;
+    const placeIds = predictions.map((prediction) => prediction.place_id);
+    res.json({ placeIds, responseData: response.data });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
