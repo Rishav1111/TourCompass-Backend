@@ -94,6 +94,22 @@ const getAllGuide = async (req, res) => {
     console.log("Error getting travellers", error);
   }
 };
+
+const getGuidebySearch = async (req, res) => {
+  try {
+    const searchQuery = req.query.search;
+    const filter = searchQuery
+      ? { expertPlace: { $regex: searchQuery, $options: "i" } }
+      : {};
+
+    const guides = await Guide.find(filter);
+
+    res.status(200).json(guides);
+  } catch (error) {
+    console.log("Error getting guides", error);
+    res.status(500).json({ error: "An error occurred while fetching guides" });
+  }
+};
 const getTraveller = async (req, res) => {
   try {
     const { id } = req.params;
@@ -242,6 +258,7 @@ module.exports = {
   updateGuide,
   getAllTraveller,
   getAllGuide,
+  getGuidebySearch,
   getTraveller,
   getGuide,
   changePassword,

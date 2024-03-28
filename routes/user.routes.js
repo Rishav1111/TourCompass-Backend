@@ -14,6 +14,7 @@ const {
   getAllTraveller,
   getAllGuide,
   getTraveller,
+  getGuidebySearch,
   getGuide,
   changePassword,
   deleteTraveller,
@@ -42,6 +43,7 @@ userRouter.put(
 //Routes for getting the profile information of both travellers and guides
 userRouter.get("/getAllTraveller", tokenExtractor, adminScope, getAllTraveller);
 userRouter.get("/getAllGuide", tokenExtractor, authUser, getAllGuide);
+userRouter.get("/getGuideBySearch", tokenExtractor, authUser, getGuidebySearch);
 userRouter.get("/getTraveller/:id", tokenExtractor, authUser, getTraveller);
 userRouter.get("/getGuide/:id", tokenExtractor, authUser, getGuide);
 
