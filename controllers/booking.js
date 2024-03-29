@@ -1,36 +1,32 @@
 const Booking = require("../models/booking.model");
 const Guide = require("../models/guide.model");
 const Traveler = require("../models/traveler.model");
-const Destination = require("../models/destination.model");
 
 const createBooking = async (req, res) => {
-  const { travelerId, guideId, destinationId, travelDate } = req.body;
+  const { travelerId, guideId, destination, travelDate } = req.body;
 
-  console.log(travelerId, guideId);
   try {
-    // Checking if the traveler, guide, and destination exist
-    const [traveler, guide, destination] = await Promise.all([
+    // Checking if the traveler, guide exist
+    const [traveler, guide] = await Promise.all([
       Traveler.findById(travelerId),
       Guide.findById(guideId),
-      Destination.findById(destinationId),
     ]);
 
-    if (!traveler || !guide || !destination) {
-      return res
-        .status(404)
-        .json({ error: "Traveler, Guide, or Destination not found" });
+    if (!traveler || !guide) {
+      return res.status(404).json({ error: "Traveler or Guide not found" });
     }
 
     const newBooking = Booking({
-      traveler: travelerId,
-      guide: guideId,
-      destination: destinationId,
+      traveler: traveler,
+      guide: guide,
+      destination: destination,
       status: "requested",
       travelDate: travelDate,
     });
     await newBooking.save();
+    console.log("New booking created!");
     res
-      .status(201)
+      .status(200)
       .json({ message: "Booking created successfully", booking: newBooking });
   } catch (error) {
     console.error("Error creating booking:", error);

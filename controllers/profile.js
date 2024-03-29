@@ -98,11 +98,16 @@ const getAllGuide = async (req, res) => {
 const getGuidebySearch = async (req, res) => {
   try {
     const searchQuery = req.query.search;
-    const filter = searchQuery
-      ? { expertPlace: { $regex: searchQuery, $options: "i" } }
-      : {};
+
+    let filter = {};
+    if (searchQuery) {
+      // Check if the first word matches
+      const firstWordRegex = new RegExp(`^${searchQuery.split(" ")[0]}`, "i");
+      filter = { expertPlace: firstWordRegex };
+    }
 
     const guides = await Guide.find(filter);
+    console.log(guides);
 
     res.status(200).json(guides);
   } catch (error) {
@@ -110,6 +115,7 @@ const getGuidebySearch = async (req, res) => {
     res.status(500).json({ error: "An error occurred while fetching guides" });
   }
 };
+
 const getTraveller = async (req, res) => {
   try {
     const { id } = req.params;

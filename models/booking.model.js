@@ -10,8 +10,8 @@ const bookingSchema = new mongoose.Schema({
     ref: "Guide",
   },
   destination: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Destination",
+    type: String,
+    required: true,
   },
   status: {
     type: String,
