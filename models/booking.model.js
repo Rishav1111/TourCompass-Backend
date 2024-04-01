@@ -13,10 +13,14 @@ const bookingSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  negotiatedPrice: {
+    type: Number,
+    required: true,
+  },
   status: {
     type: String,
-    enum: ["requested", "confirmed", "cancelled"],
-    default: "requested",
+    enum: ["Requested", "Confirmed", "Cancelled"],
+    default: "Requested",
   },
   travelDate: { type: Date, required: true },
   bookedAt: { type: Date, default: Date.now },

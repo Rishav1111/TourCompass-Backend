@@ -71,6 +71,7 @@ const updateGuide = async (req, res) => {
       return res.status(404).json({ error: "Guide not found." });
     }
 
+    console.log("updated");
     res.status(200).json({ updatedUser, msg: "Guide updated successfully." });
   } catch (error) {
     console.error("Error updating guide:", error);
