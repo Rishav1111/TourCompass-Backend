@@ -64,6 +64,7 @@ const getGuideByBooking = async (req, res) => {
         lastname: guide.lastname,
         expertPlace: guide.expertPlace,
         guidePhoto: guide.guidePhoto,
+        negotiatedPrice: booking ? booking.negotiatedPrice : null,
         status: booking ? booking.status : "No Booking Status",
         travelDate: booking ? booking.travelDate : null,
       };
@@ -115,8 +116,49 @@ const getTravelerByBooking = async (req, res) => {
   }
 };
 
+const updateBookingStatus = async (req, res) => {
+  const { bookingId } = req.params;
+  const { action } = req.body;
+
+  try {
+    const booking = await Booking.findById(bookingId);
+    if (!booking) {
+      return res.status(404).json({ error: "Booking not found" });
+    }
+
+    let updatedBooking;
+    switch (action) {
+      case "confirm":
+        updatedBooking = await Booking.findByIdAndUpdate(
+          bookingId,
+          { status: "Confirmed" },
+          { new: true }
+        );
+        break;
+      case "cancel":
+        updatedBooking = await Booking.findByIdAndUpdate(
+          bookingId,
+          { status: "Cancelled" },
+          { new: true }
+        );
+        break;
+      default:
+        return res.status(400).json({ error: "Invalid action" });
+    }
+
+    res.status(200).json({
+      message: "Booking status updated successfully",
+      booking: updatedBooking,
+    });
+  } catch (error) {
+    console.error("Error updating booking status:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 module.exports = {
   getGuideByBooking,
   getTravelerByBooking,
   createBooking,
+  updateBookingStatus,
 };
