@@ -103,9 +103,11 @@ const getTravelerByBooking = async (req, res) => {
       return {
         firstname: traveler.firstname,
         lastname: traveler.lastname,
+        negotiatedPrice: booking ? booking.negotiatedPrice : null,
         destination: booking ? booking.destination : null,
         status: booking ? booking.status : "No Booking Status",
         travelDate: booking ? booking.travelDate : null,
+        bookingId: booking ? booking._id : null,
       };
     });
 
