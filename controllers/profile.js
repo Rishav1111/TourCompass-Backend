@@ -1,5 +1,6 @@
 const Guide = require("../models/guide.model");
 const Traveller = require("../models/traveler.model");
+const Booking = require("../models/booking.model");
 const bcrypt = require("bcryptjs");
 
 const updateTraveller = async (req, res) => {
@@ -99,6 +100,7 @@ const getAllGuide = async (req, res) => {
 const getGuidebySearch = async (req, res) => {
   try {
     const searchQuery = req.query.search;
+    const travelDate = req.query.date;
 
     let filter = {};
     if (searchQuery) {
@@ -107,8 +109,21 @@ const getGuidebySearch = async (req, res) => {
       filter = { expertPlace: firstWordRegex };
     }
 
+    const bookings = await Booking.find({
+      status: "Confirmed",
+      travelDate: new Date(travelDate),
+    });
+
+    console.log("Guides with confirmed", bookings);
+
+    const guideIdsWithConfirmedBookings = bookings.map(
+      (booking) => booking.guide
+    );
+
+    // Update the filter to exclude guides with confirmed bookings for the specified date
+    filter._id = { $nin: guideIdsWithConfirmedBookings };
+
     const guides = await Guide.find(filter);
-    console.log(guides);
 
     res.status(200).json(guides);
   } catch (error) {

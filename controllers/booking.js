@@ -16,6 +16,15 @@ const createBooking = async (req, res) => {
     if (!traveler || !guide) {
       return res.status(404).json({ error: "Traveler or Guide not found" });
     }
+    const parsedDate = new Date(travelDate);
+
+    // Format the date as "yyyy-mm-dd"
+    const formattedDate =
+      parsedDate.getFullYear() +
+      "-" +
+      ("0" + (parsedDate.getMonth() + 1)).slice(-2) +
+      "-" +
+      ("0" + parsedDate.getDate()).slice(-2);
 
     const newBooking = Booking({
       traveler: traveler,
@@ -23,7 +32,7 @@ const createBooking = async (req, res) => {
       destination: destination,
       negotiatedPrice: negotiatedPrice,
       status: "Requested",
-      travelDate: travelDate,
+      travelDate: formattedDate,
     });
     await newBooking.save();
     console.log("New booking created!");
