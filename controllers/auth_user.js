@@ -294,7 +294,7 @@ const login = async (req, res) => {
     res.json({
       token,
     });
-    console.log(user.email, user._id, "logged in successfully");
+    console.log(token, "logged in successfully");
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -30,4 +30,26 @@ const saveLocation = async (req, res) => {
   }
 };
 
-module.exports = { saveLocation };
+const getUserLocation = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Find the user location document with the provided user ID
+    const userLocation = await UserLocation.findOne({ userId });
+
+    if (!userLocation) {
+      return res.status(404).json({ error: "User location not found" });
+    }
+
+    const { latitude, longitude } = userLocation;
+
+    res.status(200).json({ latitude, longitude });
+  } catch (error) {
+    console.error("Error fetching user location:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching user location" });
+  }
+};
+
+module.exports = { saveLocation, getUserLocation };
