@@ -1,4 +1,5 @@
 const UserLocation = require("../models/users_location.model");
+const Booking = require("../models/booking.model");
 
 const saveLocation = async (req, res) => {
   const { userId, latitude, longitude } = req.body;
@@ -52,4 +53,41 @@ const getUserLocation = async (req, res) => {
   }
 };
 
-module.exports = { saveLocation, getUserLocation };
+const getGuideLocation = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Find the traveler's bookings that are confirmed
+    const bookings = await Booking.find({
+      traveler: userId,
+      status: "Confirmed",
+    }).populate("guide");
+
+    if (!bookings || bookings.length === 0) {
+      // If no confirmed bookings found for the traveler
+      return res
+        .status(404)
+        .json({ message: "No confirmed bookings found for the traveler" });
+    }
+
+    const guideIds = bookings.map((booking) => booking.guide);
+
+    // Find the locations of all guides associated with the bookings
+    const guideLocations = await UserLocation.find({
+      userId: { $in: guideIds },
+    });
+
+    if (!guideLocations || guideLocations.length === 0) {
+      // If guide's locations not found
+      return res.status(404).json({ message: "Guide's locations not found" });
+    }
+
+    // Return the guide locations
+    return res.status(200).json({ guideLocations });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+module.exports = { saveLocation, getUserLocation, getGuideLocation };
