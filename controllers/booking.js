@@ -45,6 +45,37 @@ const createBooking = async (req, res) => {
   }
 };
 
+const updateBooking = async (req, res) => {
+  const { id } = req.params;
+
+  const { traveler, guide, destination, negotiatedPrice, travelDate } =
+    req.body;
+
+  try {
+    const booking = await Booking.findByIdAndUpdate(
+      { _id: id },
+      {
+        traveler,
+        guide,
+        destination,
+        negotiatedPrice,
+        travelDate,
+      },
+      { new: true }
+    );
+
+    if (!booking) {
+      return res.status(404).json({ error: "Booking not found" });
+    }
+
+    res.json(booking);
+  } catch (error) {
+    // Handle any errors that occur during the update process
+    console.error("Error updating booking:", error);
+    res.status(500).json({ error: "Failed to update booking" });
+  }
+};
+
 const getGuideByBooking = async (req, res) => {
   const { travelerId } = req.params;
   try {
@@ -184,6 +215,48 @@ const countBookings = async (req, res) => {
     res.status(500).json(error);
   }
 };
+
+const getBookingById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const booking = await Booking.findOne({ _id: id });
+    if (!booking) {
+      return res
+        .status(404)
+        .json({ message: "No booking found with that ID." });
+    }
+
+    const { traveler, guide, destination, negotiatedPrice, travelDate } =
+      booking;
+
+    res.status(200).json({
+      traveler,
+      guide,
+      destination,
+      negotiatedPrice,
+      travelDate,
+    });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+const deleteBooking = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const existingBooking = await Booking.findById(id);
+    if (!existingBooking) {
+      return res.status(404).json({ msg: "Booking not found." });
+    }
+
+    await Booking.findByIdAndDelete(id);
+
+    res.status(200).json({ msg: "Booking deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting Booking:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
 module.exports = {
   getGuideByBooking,
   getTravelerByBooking,
@@ -191,4 +264,7 @@ module.exports = {
   createBooking,
   updateBookingStatus,
   countBookings,
+  getBookingById,
+  updateBooking,
+  deleteBooking,
 };
