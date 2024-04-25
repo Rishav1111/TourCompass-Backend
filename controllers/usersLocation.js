@@ -90,4 +90,47 @@ const getGuideLocation = async (req, res) => {
   }
 };
 
-module.exports = { saveLocation, getUserLocation, getGuideLocation };
+const getTravelerLocation = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Find the guide's bookings that are confirmed
+    const bookings = await Booking.find({
+      guide: userId,
+      status: "Confirmed",
+    }).populate("traveler");
+
+    if (!bookings || bookings.length === 0) {
+      // If no confirmed bookings found for the traveler
+      return res
+        .status(404)
+        .json({ message: "No confirmed bookings found for the guide" });
+    }
+
+    const travelerId = bookings.map((booking) => booking.traveler);
+
+    // Find the locations of all guides associated with the bookings
+    const travelerLocation = await UserLocation.find({
+      userId: { $in: travelerId },
+    });
+
+    if (!travelerLocation || travelerLocation.length === 0) {
+      // If guide's locations not found
+      return res
+        .status(404)
+        .json({ message: "Traveler's locations not found" });
+    }
+
+    // Return the guide locations
+    return res.status(200).json({ travelerLocation });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+module.exports = {
+  saveLocation,
+  getUserLocation,
+  getGuideLocation,
+  getTravelerLocation,
+};
