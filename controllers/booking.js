@@ -167,9 +167,28 @@ const updateBookingStatus = async (req, res) => {
   }
 };
 
+const getAllBookings = async (req, res) => {
+  try {
+    const bookings = await Booking.find({});
+    res.status(200).json(bookings);
+  } catch (error) {
+    console.log("Error getting travellers", error);
+  }
+};
+
+const countBookings = async (req, res) => {
+  try {
+    const count = await Booking.countDocuments();
+    res.status(200).json(count);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
 module.exports = {
   getGuideByBooking,
   getTravelerByBooking,
+  getAllBookings,
   createBooking,
   updateBookingStatus,
+  countBookings,
 };
