@@ -97,6 +97,26 @@ const getAllGuide = async (req, res) => {
   }
 };
 
+const countTravelers = async (req, res) => {
+  try {
+    const count = await Traveller.countDocuments();
+    res.status(200).json(count);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+const countGuides = async (req, res) => {
+  try {
+    const count = await Guide.countDocuments();
+    console.log(count);
+    res.json(count);
+  } catch (error) {
+    console.error("Error counting guides:", error);
+    res.status(500).json({ error: "Failed to count guides" });
+  }
+};
+
 const getGuidebySearch = async (req, res) => {
   try {
     const searchQuery = req.query.search;
@@ -286,4 +306,6 @@ module.exports = {
   changePassword,
   deleteTraveller,
   deleteGuide,
+  countTravelers,
+  countGuides,
 };

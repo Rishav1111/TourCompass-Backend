@@ -11,8 +11,10 @@ const autocomplete = async (req, res) => {
       radius,
     },
     headers: {
-      "X-RapidAPI-Key": "492c355c3amshfe841aa25156cdep136d33jsnda2dfb62ec3f",
-      "X-RapidAPI-Host": "place-autocomplete1.p.rapidapi.com",
+      // "X-RapidAPI-Key": "492c355c3amshfe841aa25156cdep136d33jsnda2dfb62ec3f",
+      // "X-RapidAPI-Host": "place-autocomplete1.p.rapidapi.com",
+      "X-RapidAPI-Key": "579632e581msh63878596482ed86p1a4d71jsnbd35234c5901",
+      "X-RapidAPI-Host": "map-places.p.rapidapi.com",
     },
   };
 

@@ -19,6 +19,8 @@ const {
   changePassword,
   deleteTraveller,
   deleteGuide,
+  countTravelers,
+  countGuides,
 } = require("../controllers/profile");
 const {
   tokenExtractor,
@@ -42,7 +44,7 @@ userRouter.put(
 
 //Routes for getting the profile information of both travellers and guides
 userRouter.get("/getAllTraveller", tokenExtractor, adminScope, getAllTraveller);
-userRouter.get("/getAllGuide", tokenExtractor, authUser, getAllGuide);
+userRouter.get("/getAllGuide", tokenExtractor, adminScope, getAllGuide);
 userRouter.get("/getGuideBySearch", tokenExtractor, authUser, getGuidebySearch);
 userRouter.get("/getTraveller/:id", tokenExtractor, authUser, getTraveller);
 userRouter.get("/getGuide/:id", tokenExtractor, authUser, getGuide);
@@ -63,4 +65,6 @@ userRouter.delete("/deleteGuide/:id", tokenExtractor, authUser, deleteGuide);
 userRouter.post("/travellerverifyPin", travellerverifyPin);
 userRouter.post("/guideverifyPin", guideverifyPin);
 
+userRouter.get("/travelers/count", countTravelers);
+userRouter.get("/guides/count", countGuides);
 module.exports = userRouter;
