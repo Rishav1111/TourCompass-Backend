@@ -102,11 +102,13 @@ const getGuideByBooking = async (req, res) => {
       return {
         firstname: guide.firstname,
         lastname: guide.lastname,
+        phoneNumber: guide.phoneNumber,
         expertPlace: guide.expertPlace,
         guidePhoto: guide.guidePhoto,
         negotiatedPrice: booking ? booking.negotiatedPrice : null,
         status: booking ? booking.status : "No Booking Status",
         travelDate: booking ? booking.travelDate : null,
+        bookingId: booking ? booking._id : null,
       };
     });
 
@@ -143,6 +145,7 @@ const getTravelerByBooking = async (req, res) => {
       return {
         firstname: traveler.firstname,
         lastname: traveler.lastname,
+        phoneNumber: traveler.phoneNumber,
         negotiatedPrice: booking ? booking.negotiatedPrice : null,
         destination: booking ? booking.destination : null,
         status: booking ? booking.status : "No Booking Status",
@@ -174,6 +177,13 @@ const updateBookingStatus = async (req, res) => {
         updatedBooking = await Booking.findByIdAndUpdate(
           bookingId,
           { status: "Confirmed" },
+          { new: true }
+        );
+        break;
+      case "complete":
+        updatedBooking = await Booking.findByIdAndUpdate(
+          bookingId,
+          { status: "Completed" },
           { new: true }
         );
         break;
