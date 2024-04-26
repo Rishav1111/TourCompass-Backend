@@ -7,6 +7,8 @@ const searchRouter = require("./autocomplete.routes");
 const BookingRouter = require("./booking.routes");
 const destinationRouter = require("./destination.routes");
 const saveLocation = require("./userLocation.route");
+const reviewRouter = require("./review.routes");
+
 mainRouter
   .use(userRouter)
   .use(forgetRouter)
@@ -14,6 +16,7 @@ mainRouter
   .use(searchRouter)
   .use(BookingRouter)
   .use(destinationRouter)
-  .use(saveLocation);
+  .use(saveLocation)
+  .use(reviewRouter);
 
 module.exports = mainRouter;

@@ -17,7 +17,7 @@ const {
   authUser,
 } = require("../middleware/token_auth");
 
-router.post("/booking", tokenExtractor, createBooking);
+router.post("/booking", tokenExtractor, authUser, createBooking);
 router.get("/getAllbookings", tokenExtractor, adminScope, getAllBookings);
 router.get("/bookings/:travelerId/guide", getGuideByBooking);
 router.get("/bookings/:guideId/traveler", getTravelerByBooking);
