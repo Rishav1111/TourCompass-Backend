@@ -1,6 +1,7 @@
 const Booking = require("../models/booking.model");
 const Guide = require("../models/guide.model");
 const Traveler = require("../models/traveler.model");
+const createNotification = require("./notification").createNotification;
 
 const createBooking = async (req, res) => {
   const { travelerId, guideId, destination, negotiatedPrice, travelDate } =
@@ -35,6 +36,13 @@ const createBooking = async (req, res) => {
       travelDate: formattedDate,
     });
     await newBooking.save();
+    const notificationData = {
+      guideId: guideId,
+      travelerId: travelerId,
+      eventType: "BookingRequest",
+      status: "Unread",
+    };
+    await createNotification(notificationData);
     console.log("New booking created!");
     res
       .status(200)
@@ -78,43 +86,35 @@ const updateBooking = async (req, res) => {
 
 const getGuideByBooking = async (req, res) => {
   const { travelerId } = req.params;
-  try {
-    // Find bookings made by the traveler
-    const bookings = await Booking.find({ traveler: travelerId });
 
+  try {
+    const bookings = await Booking.find({ traveler: travelerId }).populate({
+      path: "guide",
+      select: "firstname lastname phoneNumber expertPlace guidePhoto",
+    });
+
+    // Check if bookings exist
     if (!bookings || bookings.length === 0) {
       return res
         .status(404)
         .json({ error: "No bookings found for the traveler" });
     }
 
-    // Extracting guideIds from bookings
-    const guideIds = bookings.map((booking) => booking.guide);
+    const guideDetails = bookings.map((booking) => ({
+      guideId: booking.guide._id,
+      firstname: booking.guide.firstname,
+      lastname: booking.guide.lastname,
+      phoneNumber: booking.guide.phoneNumber,
+      expertPlace: booking.guide.expertPlace,
+      guidePhoto: booking.guide.guidePhoto,
+      negotiatedPrice: booking.negotiatedPrice,
+      status: booking.status,
+      travelDate: booking.travelDate,
+      bookingId: booking._id,
+    }));
 
-    // Retrieving guide details for each guideId
-    const guides = await Guide.find({ _id: { $in: guideIds } });
-
-    // Extracting guide details and booking status
-    const guideDetails = guides.map((guide) => {
-      const booking = bookings.find((booking) =>
-        booking.guide.equals(guide._id)
-      );
-      return {
-        firstname: guide.firstname,
-        lastname: guide.lastname,
-        phoneNumber: guide.phoneNumber,
-        expertPlace: guide.expertPlace,
-        guidePhoto: guide.guidePhoto,
-        negotiatedPrice: booking ? booking.negotiatedPrice : null,
-        status: booking ? booking.status : "No Booking Status",
-        travelDate: booking ? booking.travelDate : null,
-        bookingId: booking ? booking._id : null,
-      };
-    });
-
+    // Return the guide details as a JSON response
     res.status(200).json(guideDetails);
-
-    console.log(guideDetails);
   } catch (error) {
     console.error("Error fetching guide details by booking:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -123,36 +123,30 @@ const getGuideByBooking = async (req, res) => {
 
 const getTravelerByBooking = async (req, res) => {
   const { guideId } = req.params;
-  try {
-    // Find bookings assigned to the guide
-    const bookings = await Booking.find({ guide: guideId });
 
+  try {
+    // Find bookings assigned to the guide and populate the traveler field
+    const bookings = await Booking.find({ guide: guideId }).populate({
+      path: "traveler",
+      select: "firstname lastname phoneNumber",
+    });
+
+    // Check if any bookings exist for the guide
     if (!bookings || bookings.length === 0) {
       return res.status(404).json({ error: "No bookings found for the guide" });
     }
 
-    // Extracting travelerIds from bookings
-    const travelerIds = bookings.map((booking) => booking.traveler);
-
-    // Retrieving traveler details for each travelerId
-    const travelers = await Traveler.find({ _id: { $in: travelerIds } });
-
-    // Extracting traveler details and booking status
-    const travelerDetails = travelers.map((traveler) => {
-      const booking = bookings.find((booking) =>
-        booking.traveler.equals(traveler._id)
-      );
-      return {
-        firstname: traveler.firstname,
-        lastname: traveler.lastname,
-        phoneNumber: traveler.phoneNumber,
-        negotiatedPrice: booking ? booking.negotiatedPrice : null,
-        destination: booking ? booking.destination : null,
-        status: booking ? booking.status : "No Booking Status",
-        travelDate: booking ? booking.travelDate : null,
-        bookingId: booking ? booking._id : null,
-      };
-    });
+    // Extract traveler details and booking status from populated bookings
+    const travelerDetails = bookings.map((booking) => ({
+      firstname: booking.traveler.firstname,
+      lastname: booking.traveler.lastname,
+      phoneNumber: booking.traveler.phoneNumber,
+      negotiatedPrice: booking.negotiatedPrice,
+      destination: booking.destination,
+      status: booking.status,
+      travelDate: booking.travelDate,
+      bookingId: booking._id,
+    }));
 
     res.status(200).json(travelerDetails);
   } catch (error) {
@@ -179,6 +173,12 @@ const updateBookingStatus = async (req, res) => {
           { status: "Confirmed" },
           { new: true }
         );
+        await createNotification({
+          guideId: booking.guide._id,
+          travelerId: booking.traveler._id,
+          eventType: "BookingConfirmation",
+          status: "Unread",
+        });
         break;
       case "complete":
         updatedBooking = await Booking.findByIdAndUpdate(
@@ -186,6 +186,12 @@ const updateBookingStatus = async (req, res) => {
           { status: "Completed" },
           { new: true }
         );
+        await createNotification({
+          guideId: booking.guide._id,
+          travelerId: booking.traveler._id,
+          eventType: "BookingCompleted",
+          status: "Unread",
+        });
         break;
       case "cancel":
         updatedBooking = await Booking.findByIdAndUpdate(
@@ -193,6 +199,12 @@ const updateBookingStatus = async (req, res) => {
           { status: "Cancelled" },
           { new: true }
         );
+        await createNotification({
+          guideId: booking.guide._id,
+          travelerId: booking.traveler._id,
+          eventType: "BookingCancelled",
+          status: "Unread",
+        });
         break;
       default:
         return res.status(400).json({ error: "Invalid action" });

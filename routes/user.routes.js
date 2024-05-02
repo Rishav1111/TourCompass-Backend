@@ -6,6 +6,7 @@ const {
   login,
   travellerverifyPin,
   guideverifyPin,
+  verifyGuide,
 } = require("../controllers/auth_user");
 
 const {
@@ -64,6 +65,12 @@ userRouter.delete("/deleteGuide/:id", tokenExtractor, authUser, deleteGuide);
 //Routes for verifying the  traveller and guide
 userRouter.post("/travellerverifyPin", travellerverifyPin);
 userRouter.post("/guideverifyPin", guideverifyPin);
+userRouter.put(
+  "/verify-guide/:guideId",
+  tokenExtractor,
+  adminScope,
+  verifyGuide
+);
 
 userRouter.get("/travelers/count", countTravelers);
 userRouter.get("/guides/count", countGuides);

@@ -9,7 +9,7 @@ const reviewSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Guide",
   },
-  message: {
+  feedback: {
     type: String,
     required: true,
   },

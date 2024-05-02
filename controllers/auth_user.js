@@ -282,6 +282,12 @@ const login = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ msg: "Invalid email or password." });
     }
+
+    if (user.userType === "guide" && user.verification !== "Verified") {
+      return res.status(403).json({
+        msg: "Your account is not verified. Please wait until verified.",
+      });
+    }
     let tokenData = {
       id: user._id,
       firstname: user.firstname,
@@ -300,10 +306,52 @@ const login = async (req, res) => {
   }
 };
 
+const verifyGuide = async (req, res) => {
+  const { guideId } = req.params;
+  const { verificationStatus } = req.body;
+
+  try {
+    const guide = await Guide.findByIdAndUpdate(
+      guideId,
+      { verification: verificationStatus },
+      { new: true }
+    );
+
+    if (!guide) {
+      return res.status(404).json({ error: "Guide not found" });
+    }
+
+    if (verificationStatus == "Verified") {
+      const email = guide.email;
+      const boilerPlate = `<div style="font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px;">
+      <h2 style="color: #333;">Hello ${guide.firstname} ${guide.lastname},</h2>
+      <p style="color: #333;">Your guide verification has been approved.</p>
+      <p style="color: #333;">Congratulations! You can now start offering your guide services.</p>
+      <p style="color: #333;">Thank you!</p>
+      </div>`;
+
+      // Send the email
+      await sentEmail(email, boilerPlate, "Guide Verification Approved.");
+    }
+
+    res.status(200).json({
+      message: `Guide verification status updated to ${verificationStatus}`,
+      guide,
+    });
+    console.log(
+      `Guide verification status updated for guide ID ${guideId} to ${verificationStatus}`
+    );
+  } catch (error) {
+    console.error("Error updating guide verification:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 module.exports = {
   createGuide,
   createTraveller,
   login,
   travellerverifyPin,
   guideverifyPin,
+  verifyGuide,
 };

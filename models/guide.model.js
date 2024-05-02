@@ -50,6 +50,11 @@ const guideSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  verification: {
+    type: String,
+    enum: ["Pending", "Verified", "Rejected"],
+    default: "Pending",
+  },
   resetPin: String,
   resetPinExpiration: Date,
 });

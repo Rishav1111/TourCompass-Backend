@@ -1,24 +1,27 @@
 const Review = require("../models/reviews.model");
+const Traveler = require("../models/traveler.model");
 
 const createReview = async (req, res) => {
   try {
-    const { travelerId, guideId, message, rating } = req.body;
-    if (!travelerId || !guideId || !message || !rating) {
+    const { travelerId, guideId, feedback, rating } = req.body;
+    if (!travelerId || !guideId || !feedback || !rating) {
       return res.status(400).json({ msg: "Please provide all fields" });
     }
 
     const newReview = new Review({
       travelerId,
       guideId,
-      message,
+      feedback,
       rating,
     });
 
     await newReview.save();
 
     res.status(201).json(newReview);
+    console.log(newReview);
   } catch (error) {
-    res.status(500).json({ error: "Failed to create review" });
+    console.log(error);
+    res.status(500).json(error);
   }
 };
 
@@ -61,12 +64,34 @@ const getReviewsbyGuideId = async (req, res) => {
     const { id } = req.params;
 
     const reviews = await Review.find({ guideId: id });
-    res.status(200).json(reviews);
+
+    if (reviews.length === 0) {
+      return res.status(404).json({ message: "No Reviews Found!" });
+    }
+
+    const travelerIds = reviews.map((review) => review.travelerId);
+
+    const travelers = await Traveler.find({ _id: { $in: travelerIds } });
+
+    const travelerDetails = travelers.map((traveler) => {
+      const review = reviews.find((review) =>
+        review.travelerId.equals(traveler._id)
+      );
+      return {
+        firstname: traveler.firstname,
+        lastname: traveler.lastname,
+        rating: review.rating,
+        feedback: review.feedback,
+      };
+    });
+
+    res.status(200).json({ travelerDetails });
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching reviews by guide ID:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 const deleteReview = async (req, res) => {
   const { reviewId } = req.params;
 
@@ -82,10 +107,20 @@ const deleteReview = async (req, res) => {
     res.status(500).json({ error: "Failed to delete review" });
   }
 };
+
+const countReviews = async (req, res) => {
+  try {
+    const count = await Review.countDocuments();
+    res.status(200).json(count);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
 module.exports = {
   createReview,
   updateReview,
   getAllReviews,
   getReviewsbyGuideId,
   deleteReview,
+  countReviews,
 };

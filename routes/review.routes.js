@@ -6,6 +6,7 @@ const {
   updateReview,
   getReviewsbyGuideId,
   deleteReview,
+  countReviews,
 } = require("../controllers/review");
 const {
   tokenExtractor,
@@ -13,16 +14,15 @@ const {
   authUser,
 } = require("../middleware/token_auth");
 
-router.post("/createReview", tokenExtractor, authUser, createReview);
+router.post("/createReview", createReview);
 router.put("/updateReview/:id", tokenExtractor, adminScope, updateReview);
 router.get("/getAllReviews", tokenExtractor, adminScope, getAllReviews);
 router.get(
   "/getReviewByGuideId/:id",
-  tokenExtractor,
-  authUser,
+
   getReviewsbyGuideId
 );
 
 router.delete("/deleteReview/:id", tokenExtractor, adminScope, deleteReview);
-
+router.get("/reviews/count", countReviews);
 module.exports = router;
