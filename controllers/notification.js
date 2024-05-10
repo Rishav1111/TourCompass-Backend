@@ -111,8 +111,26 @@ const getTravelerNotifications = async (req, res) => {
   }
 };
 
+const deleteNotificationOfTraveler = async (req, res) => {
+  try {
+    let { travelerId } = req.params;
+    if (!travelerId) {
+      return res.status(400).json({ error: "travelerId is required" });
+    }
+    await Notification.deleteMany({ travelerId: travelerId });
+    return res
+      .status(200)
+      .json({ message: "Notification deleted successfully" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: "An error occurred while deleting the notification" });
+  }
+};
+
 module.exports = {
   createNotification,
   getGuideNotifications,
   getTravelerNotifications,
+  deleteNotificationOfTraveler,
 };

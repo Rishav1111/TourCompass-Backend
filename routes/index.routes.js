@@ -9,6 +9,7 @@ const destinationRouter = require("./destination.routes");
 const saveLocation = require("./userLocation.route");
 const reviewRouter = require("./review.routes");
 const notificationRouter = require("./notification.routes");
+const paymentRouter = require("./payment.routes");
 
 mainRouter
   .use(userRouter)
@@ -19,6 +20,7 @@ mainRouter
   .use(destinationRouter)
   .use(saveLocation)
   .use(reviewRouter)
-  .use(notificationRouter);
+  .use(notificationRouter)
+  .use(paymentRouter);
 
 module.exports = mainRouter;
