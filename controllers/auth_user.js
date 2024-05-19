@@ -191,6 +191,7 @@ const createGuide = async (req, res) => {
         <div style="display: inline-block; background-color: #4caf50; color: #fff; padding: 10px 20px; border-radius: 5px; margin-bottom: 20px;">
             <h3 style="margin: 0; font-size: 20px; font-weight: bold;">${pin}</h3>
         </div>
+        <p style="color: #333;">Please Wait until you get the email of guide verification. </p>
         <p style="color: #333;">This OTP code will expire after 60 seconds.</p>
         <p style="color: #333;">Thank you!</p>
     </div>`;

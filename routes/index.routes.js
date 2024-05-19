@@ -11,6 +11,7 @@ const reviewRouter = require("./review.routes");
 const notificationRouter = require("./notification.routes");
 const paymentRouter = require("./payment.routes");
 
+// all the routes
 mainRouter
   .use(userRouter)
   .use(forgetRouter)

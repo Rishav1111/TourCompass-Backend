@@ -22,6 +22,11 @@ const bookingSchema = new mongoose.Schema({
     enum: ["Requested", "Confirmed", "Completed", "Cancelled"],
     default: "Requested",
   },
+  paymentStatus: {
+    type: String,
+    enum: ["Pending", "Cash Pay", "Khalti Pay"],
+    default: "Pending",
+  },
   travelDate: { type: Date, required: true },
   bookedAt: { type: Date, default: Date.now },
 });

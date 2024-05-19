@@ -6,6 +6,7 @@ const {
   resetPassword,
 } = require("../controllers/forgetPassword");
 
+// routes of forgetpassword, verify pin and rest password
 router.post("/forgetpassword", FORGETPASSWORD);
 router.post("/verifyPin", verifyPin);
 router.post("/resetPassword", resetPassword);

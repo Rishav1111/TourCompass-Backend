@@ -3,6 +3,7 @@ const router = express.Router();
 
 const { register, login } = require("../controllers/admin");
 
+//Admin login and  register route
 router.post("/register", register);
 router.post("/adminlogin", login);
 

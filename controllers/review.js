@@ -63,29 +63,27 @@ const getReviewsbyGuideId = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const reviews = await Review.find({ guideId: id });
+    // Fetch reviews for the given guide ID and populate traveler details
+    const reviews = await Review.find({ guideId: id }).populate(
+      "travelerId",
+      "firstname lastname"
+    );
 
     if (reviews.length === 0) {
       return res.status(404).json({ message: "No Reviews Found!" });
     }
 
-    const travelerIds = reviews.map((review) => review.travelerId);
-
-    const travelers = await Traveler.find({ _id: { $in: travelerIds } });
-
-    const travelerDetails = travelers.map((traveler) => {
-      const review = reviews.find((review) =>
-        review.travelerId.equals(traveler._id)
-      );
+    // Map the reviews to include traveler details
+    const reviewDetails = reviews.map((review) => {
       return {
-        firstname: traveler.firstname,
-        lastname: traveler.lastname,
+        firstname: review.travelerId.firstname,
+        lastname: review.travelerId.lastname,
         rating: review.rating,
         feedback: review.feedback,
       };
     });
 
-    res.status(200).json({ travelerDetails });
+    res.status(200).json({ reviews: reviewDetails });
   } catch (error) {
     console.error("Error fetching reviews by guide ID:", error);
     res.status(500).json({ error: "Internal server error" });

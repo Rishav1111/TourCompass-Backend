@@ -111,7 +111,9 @@ const getGuideByBooking = async (req, res) => {
       status: booking.status,
       travelDate: booking.travelDate,
       bookingId: booking._id,
+      paymentStatus: booking.paymentStatus,
     }));
+    console.log(guideDetails);
 
     // Return the guide details as a JSON response
     res.status(200).json(guideDetails);
@@ -146,8 +148,10 @@ const getTravelerByBooking = async (req, res) => {
       status: booking.status,
       travelDate: booking.travelDate,
       bookingId: booking._id,
+      paymentStatus: booking.paymentStatus,
     }));
 
+    console.log(travelerDetails);
     res.status(200).json(travelerDetails);
   } catch (error) {
     console.error("Error fetching traveler details by booking:", error);
@@ -206,6 +210,22 @@ const updateBookingStatus = async (req, res) => {
           status: "Unread",
         });
         break;
+
+      case "cash":
+        updatedBooking = await Booking.findByIdAndUpdate(
+          bookingId,
+          { paymentStatus: "Cash Pay" },
+          { new: true }
+        );
+        break;
+      case "khalti":
+        updatedBooking = await Booking.findByIdAndUpdate(
+          bookingId,
+          { paymentStatus: "Khalti Pay" },
+          { new: true }
+        );
+        break;
+
       default:
         return res.status(400).json({ error: "Invalid action" });
     }
